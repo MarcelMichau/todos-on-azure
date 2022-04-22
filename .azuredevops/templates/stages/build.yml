@@ -1,0 +1,52 @@
+parameters:
+  - name: stage
+    type: string
+    default: Deploy
+  - name: dependsOn
+    type: object
+    default: []
+  - name: condition
+    type: string
+    default: and(succeeded(), true)
+
+stages:
+  - stage: ${{parameters.stage}}
+    dependsOn: ${{parameters.dependsOn}}
+    condition: ${{parameters.condition}}
+    displayName: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    jobs:
+      - job: Build
+        displayName: 'Build API Function'
+
+        variables:
+          buildConfiguration: 'release'
+          artifactName: api
+
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: 'Restore project dependencies'
+            inputs:
+              command: 'restore'
+              projects: '**/*.csproj'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Build the project'
+            inputs:
+              command: 'build'
+              arguments: '--no-restore --configuration $(buildConfiguration)'
+              projects: '**/*.csproj'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Publish the project'
+            inputs:
+              command: 'publish'
+              projects: '**/*.csproj'
+              publishWebProjects: false
+              arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(artifactName)'
+              zipAfterPublish: true
+
+          - publish: '$(Build.ArtifactStagingDirectory)/$(artifactName)'
+            displayName: 'Publish Artifact - $(artifactName)'
+            artifact: $(artifactName)

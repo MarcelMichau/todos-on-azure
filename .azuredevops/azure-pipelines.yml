@@ -1,0 +1,29 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+
+parameters:
+  - name: deploy
+    displayName: Infrastructure to Deploy
+    type: object
+    default:
+      - path: api
+
+variables:
+  serviceConnection: PersonalSubscriptionServiceConnection
+
+stages:
+  - template: templates/stages/build.yml@Self
+    parameters:
+      stage: Build
+
+  - template: templates/stages/deploy.yml@Self
+    parameters:
+      stage: Deploy_dev
+      dependsOn:
+        - Build
+      environment: dev
+      serviceConnection: ${{ variables.serviceConnection }}
+      infra: ${{ parameters.deploy }}

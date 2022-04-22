@@ -1,0 +1,72 @@
+parameters:
+  - name: stage
+    type: string
+    default: Deploy
+  - name: dependsOn
+    type: object
+    default: []
+  - name: condition
+    type: string
+    default: and(succeeded(), true)
+  - name: serviceConnection
+    type: string
+  - name: environment
+    type: string
+  - name: infra
+    type: object
+
+stages:
+  - stage: ${{parameters.stage}}
+    dependsOn: ${{parameters.dependsOn}}
+    condition: ${{parameters.condition}}
+    displayName: 'Deploy Environment - ${{ parameters.environment }}'
+    pool:
+      vmImage: 'ubuntu-latest'
+    variables:
+      - template: ../variables/${{ parameters.environment }}.yml@Self
+    jobs:
+      - deployment: DeployBicepTemplates
+        displayName: 'Deploy Bicep Templates'
+        environment: 'todos-on-azure-${{ parameters.environment }}'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - download: current
+                  displayName: 'Download Artifact - api'
+                  artifact: api
+
+                - task: AzureCLI@1
+                  displayName: 'Install Bicep CLI'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      az bicep install
+
+                - task: AzureCLI@1
+                  displayName: 'Login to ACR'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptLocation: 'inlineScript'
+                    inlineScript: |
+                      az acr login -n $(containerRegistry)
+
+                - ${{ each value in parameters.infra }}:
+                    - task: AzureCLI@1
+                      displayName: 'Deploy Infrastructure'
+                      inputs:
+                        azureSubscription: $(serviceConnection)
+                        scriptLocation: 'inlineScript'
+                        inlineScript: |
+                          az deployment sub create -f infra/${{ value.path }}/main.bicep -l $(location) --parameters appName=$(appName) appShortName=$(appShortName)
+
+                - task: AzureFunctionApp@1
+                  displayName: 'Deploy Azure Function'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    appType: functionAppLinux
+                    appName: func-$(appName)
+                    package: '$(Pipeline.Workspace)/api/**.zip'
