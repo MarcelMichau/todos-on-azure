@@ -25,11 +25,15 @@ stages:
           artifactName: api
 
         steps:
+          - task: NuGetAuthenticate@0
+
           - task: DotNetCoreCLI@2
             displayName: 'Restore project dependencies'
             inputs:
               command: 'restore'
               projects: '**/*.csproj'
+              nugetConfigPath: '../../../nuget.config'
+              feedsToUse: config
 
           - task: DotNetCoreCLI@2
             displayName: 'Build the project'

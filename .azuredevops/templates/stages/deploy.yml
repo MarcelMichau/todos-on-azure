@@ -69,4 +69,4 @@ stages:
                     azureSubscription: $(serviceConnection)
                     appType: functionAppLinux
                     appName: func-$(appName)
-                    package: '$(Pipeline.Workspace)/api/**.zip'
+                    package: '$(Pipeline.Workspace)/**/*.zip'
