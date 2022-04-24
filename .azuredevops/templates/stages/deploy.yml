@@ -74,8 +74,9 @@ stages:
                         csmFile: 'infra/${{ value.path }}/main.json'
                         deploymentMode: Incremental
                         overrideParameters: >-
-                          --appName $(appName)
-                          --appShortName $(appShortName)
+                          -location "$(location)"
+                          -appName "$(appName)"
+                          -appShortName "$(appShortName)"
 
                 - task: AzureFunctionApp@1
                   displayName: 'Deploy Azure Function'
