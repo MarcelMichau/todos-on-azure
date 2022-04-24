@@ -55,8 +55,13 @@ stages:
                       az acr login -n $(containerRegistry)
 
                 - ${{ each value in parameters.infra }}:
-                    - script: 'az bicep build -f infra/${{ value.path }}/main.bicep'
+                    - task: AzureCLI@1
                       displayName: 'Bicep Build'
+                      inputs:
+                        azureSubscription: $(serviceConnection)
+                        scriptLocation: 'inlineScript'
+                        inlineScript: |
+                          az bicep build -f infra/${{ value.path }}/main.bicep
 
                     - task: AzureResourceManagerTemplateDeployment@3
                       displayName: 'Deploy Infrastructure'
