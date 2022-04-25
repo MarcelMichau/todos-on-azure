@@ -60,8 +60,13 @@ stages:
                       inputs:
                         azureSubscription: $(serviceConnection)
                         scriptLocation: 'inlineScript'
-                        inlineScript: |
-                          az deployment sub create -f infra/${{ value.path }}/main.bicep -l $(location) --parameters appName=$(appName) appShortName=$(appShortName)
+                        inlineScript: >-
+                          az deployment sub create -f infra/${{ value.path }}/main.bicep 
+                          --location $(deploymentMetadataLocation) 
+                          --parameters 
+                          location=$(resourceLocation) 
+                          appName=$(appName) 
+                          appShortName=$(appShortName)
 
                 - task: AzureFunctionApp@1
                   displayName: 'Deploy Azure Function'
