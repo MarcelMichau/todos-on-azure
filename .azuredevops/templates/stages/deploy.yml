@@ -56,27 +56,12 @@ stages:
 
                 - ${{ each value in parameters.infra }}:
                     - task: AzureCLI@1
-                      displayName: 'Bicep Build'
+                      displayName: 'Deploy Infrastructure'
                       inputs:
                         azureSubscription: $(serviceConnection)
                         scriptLocation: 'inlineScript'
                         inlineScript: |
-                          az bicep build -f infra/${{ value.path }}/main.bicep
-
-                    - task: AzureResourceManagerTemplateDeployment@3
-                      displayName: 'Deploy Infrastructure'
-                      inputs:
-                        deploymentScope: Subscription
-                        azureResourceManagerConnection: $(serviceConnection)
-                        action: Create Or Update Resource Group
-                        location: $(location)
-                        templateLocation: Linked artifact
-                        csmFile: 'infra/${{ value.path }}/main.json'
-                        deploymentMode: Incremental
-                        overrideParameters: >-
-                          -location "$(location)"
-                          -appName "$(appName)"
-                          -appShortName "$(appShortName)"
+                          az deployment sub create -f infra/${{ value.path }}/main.bicep -l $(location) --parameters appName=$(appName) appShortName=$(appShortName)
 
                 - task: AzureFunctionApp@1
                   displayName: 'Deploy Azure Function'

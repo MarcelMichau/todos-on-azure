@@ -2,4 +2,4 @@ variables:
   appName: todos-on-azure
   appShortName: todosazure
   containerRegistry: acrmarcelmichau
-  location: southafricanorth
+  location: northeurope
