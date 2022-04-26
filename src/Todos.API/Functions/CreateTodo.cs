@@ -1,5 +1,7 @@
 using System.Net;
+using System.Net.Mime;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -9,12 +11,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Todos.Domain;
 
-namespace Todos.API;
+namespace Todos.API.Functions;
 
 internal class CreateTodo
 {
-    private const string TableName = "todos";
-
     private readonly ILogger<CreateTodo> _logger;
 
     public CreateTodo(ILogger<CreateTodo> log)
@@ -25,10 +25,10 @@ internal class CreateTodo
     [FunctionName("CreateTodo")]
     [OpenApiOperation(operationId: "Run", tags: new[] { "CreateTodo" })]
     [OpenApiParameter(name: "todoText", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **TodoText** parameter")]
-    [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "application/json", bodyType: typeof(Todo), Description = "The OK response")]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: MediaTypeNames.Application.Json, bodyType: typeof(Todo), Description = "The OK response")]
     public async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "todos")] HttpRequest request,
-        [Table(TableName, Connection = "AzureWebJobsStorage")] IAsyncCollector<TodoTableEntity> todoTable)
+        [Table(Constants.TableName, Connection = Constants.TableConnectionKey)] TableClient todoTable)
     {
         _logger.LogInformation("Creating a new Todo");
 
@@ -36,8 +36,10 @@ internal class CreateTodo
 
         var newTodo = new Todo(todoText);
 
-        await todoTable.AddAsync(newTodo.ToTableEntity());
+        await todoTable.AddEntityAsync(newTodo.ToTableEntity());
 
-        return new OkObjectResult(newTodo);
+        var newRow = await todoTable.GetEntityAsync<TodoTableEntity>(Constants.PartitionKey, newTodo.Id.ToString());
+
+        return new OkObjectResult(newRow.Value.ToTodo());
     }
 }

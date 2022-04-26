@@ -8,7 +8,7 @@ internal static class Mappings
     {
         return new TodoTableEntity
         {
-            PartitionKey = "TODO",
+            PartitionKey = Constants.PartitionKey,
             RowKey = todo.Id.ToString(),
             IsDone = todo.IsDone,
             Text = todo.Text
