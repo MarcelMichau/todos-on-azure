@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
@@ -22,11 +23,11 @@ internal class GetAllTodos
         _logger = log;
     }
 
-    [FunctionName("GetAllTodos")]
-    [OpenApiOperation(operationId: "Run", tags: new[] { "GetAllTodos" })]
+    [FunctionName(nameof(GetAllTodos))]
+    [OpenApiOperation(operationId: nameof(GetAllTodos), tags: new[] { nameof(GetAllTodos) })]
     [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: MediaTypeNames.Application.Json, bodyType: typeof(List<Todo>), Description = "The OK response")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "todos")] HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, nameof(HttpMethod.Get), Route = "todos")] HttpRequest request,
         [Table(Constants.TableName, Constants.PartitionKey, Connection = Constants.TableConnectionKey)] TableClient todoTable)
     {
         _logger.LogInformation("Getting all todos");

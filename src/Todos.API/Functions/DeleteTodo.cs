@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
@@ -20,12 +21,12 @@ internal class DeleteTodo
         _logger = log;
     }
 
-    [FunctionName("DeleteTodo")]
-    [OpenApiOperation(operationId: "Run", tags: new[] { "DeleteTodo" })]
+    [FunctionName(nameof(DeleteTodo))]
+    [OpenApiOperation(operationId: nameof(DeleteTodo), tags: new[] { nameof(DeleteTodo) })]
     [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Description = "The **Id** route parameter")]
     [OpenApiResponseWithoutBody(statusCode: HttpStatusCode.OK, Description = "The OK response")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "todos/{id}")] HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, nameof(HttpMethod.Delete), Route = "todos/{id}")] HttpRequest request,
         [Table(Constants.TableName, Connection = Constants.TableConnectionKey)] TableClient todoTable, string id)
     {
         try

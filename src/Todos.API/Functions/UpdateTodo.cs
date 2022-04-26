@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http;
 using System.Net.Mime;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -24,13 +25,13 @@ internal class UpdateTodo
         _logger = log;
     }
 
-    [FunctionName("UpdateTodo")]
-    [OpenApiOperation(operationId: "Run", tags: new[] { "UpdateTodo" })]
+    [FunctionName(nameof(UpdateTodo))]
+    [OpenApiOperation(operationId: nameof(UpdateTodo), tags: new[] { nameof(UpdateTodo) })]
     [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = true, Type = typeof(string), Description = "The **Id** route parameter")]
     [OpenApiRequestBody(MediaTypeNames.Application.Json, typeof(UpdateTodoModel))]
     [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: MediaTypeNames.Application.Json, bodyType: typeof(Todo), Description = "The OK response")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "todos/{id}")] HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, nameof(HttpMethod.Put), Route = "todos/{id}")] HttpRequest request,
         [Table(Constants.TableName, Connection = Constants.TableConnectionKey)] TableClient todoTable, string id)
     {
         _logger.LogInformation("Updating todo with ID: {id}", id);

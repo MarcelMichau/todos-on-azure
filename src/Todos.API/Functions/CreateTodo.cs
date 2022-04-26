@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Azure.Data.Tables;
@@ -22,12 +23,12 @@ internal class CreateTodo
         _logger = log;
     }
 
-    [FunctionName("CreateTodo")]
-    [OpenApiOperation(operationId: "Run", tags: new[] { "CreateTodo" })]
+    [FunctionName(nameof(CreateTodo))]
+    [OpenApiOperation(operationId: nameof(CreateTodo), tags: new[] { nameof(CreateTodo) })]
     [OpenApiParameter(name: "todoText", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **TodoText** parameter")]
     [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: MediaTypeNames.Application.Json, bodyType: typeof(Todo), Description = "The OK response")]
     public async Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "todos")] HttpRequest request,
+        [HttpTrigger(AuthorizationLevel.Anonymous, nameof(HttpMethod.Post), Route = "todos")] HttpRequest request,
         [Table(Constants.TableName, Connection = Constants.TableConnectionKey)] TableClient todoTable)
     {
         _logger.LogInformation("Creating a new Todo");
