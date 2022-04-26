@@ -7,6 +7,7 @@ internal class TodoTableEntity : BaseTableEntity
 {
     public string Text { get; set; }
     public bool IsDone { get; set; }
+    public DateTimeOffset CreatedOn { get; set; }
 }
 
 internal class BaseTableEntity : ITableEntity

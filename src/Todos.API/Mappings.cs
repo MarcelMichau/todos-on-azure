@@ -1,4 +1,5 @@
-﻿using Todos.Domain;
+﻿using System;
+using Todos.Domain;
 
 namespace Todos.API;
 internal static class Mappings
@@ -14,13 +15,13 @@ internal static class Mappings
         };
     }
 
-    //public static Todo ToTodo(this TodoTableEntity todo)
-    //{
-    //    return new Todo
-    //    {
-    //        Id = todo.RowKey,
-    //        IsCompleted = todo.IsDone,
-    //        TaskDescription = todo.Text
-    //    };
-    //}
+    public static Todo ToTodo(this TodoTableEntity todo)
+    {
+        return new Todo(todo.Text)
+        {
+            Id = Guid.Parse(todo.RowKey),
+            CreatedOn = todo.Timestamp ?? DateTimeOffset.MinValue,
+            IsDone = todo.IsDone
+        };
+    }
 }
