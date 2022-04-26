@@ -25,8 +25,8 @@ stages:
     variables:
       - template: ../variables/${{ parameters.environment }}.yml@Self
     jobs:
-      - deployment: DeployBicepTemplates
-        displayName: 'Deploy Bicep Templates'
+      - deployment: DeployApp
+        displayName: 'Deploy App'
         environment: 'todos-on-azure-${{ parameters.environment }}'
         strategy:
           runOnce:
