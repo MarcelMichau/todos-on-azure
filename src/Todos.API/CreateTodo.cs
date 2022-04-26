@@ -11,8 +11,10 @@ using Todos.Domain;
 
 namespace Todos.API
 {
-    public class CreateTodo
+    internal class CreateTodo
     {
+        private const string TableName = "todos";
+
         private readonly ILogger<CreateTodo> _logger;
 
         public CreateTodo(ILogger<CreateTodo> log)
@@ -21,17 +23,20 @@ namespace Todos.API
         }
 
         [FunctionName("CreateTodo")]
-        [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
+        [OpenApiOperation(operationId: "Run", tags: new[] { "CreateTodo" })]
         [OpenApiParameter(name: "todoText", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **TodoText** parameter")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "todos")] HttpRequest req,
+            [Table(TableName, Connection = "AzureWebJobsStorage")] IAsyncCollector<TodoTableEntity> todoTable)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            _logger.LogInformation("Creating a new Todo");
 
             string todoText = req.Query["todoText"];
 
             var newTodo = new Todo(todoText);
+
+            await todoTable.AddAsync(newTodo.ToTableEntity());
 
             return new OkObjectResult(newTodo);
         }
