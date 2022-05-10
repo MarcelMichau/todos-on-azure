@@ -34,8 +34,8 @@ module appServicePlan 'br:acrmarcelmichau.azurecr.io/bicep/modules/app-service-p
     location: location
     kind: 'linux'
     sku: {
-      name: 'B1'
-      capacity: 1
+      name: 'Y1'
+      tier: 'Dynamic'
     }
   }
   scope: appResourceGroup
