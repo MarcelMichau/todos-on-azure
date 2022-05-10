@@ -48,7 +48,6 @@ module functionApp 'br:acrmarcelmichau.azurecr.io/bicep/modules/function-app:v0.
     location: location
     appServicePlanName: appServicePlan.outputs.name
     storageAccountName: storageAccount.outputs.name
-    linuxFxVersion: 'DOTNETCORE|6.0'
   }
   scope: appResourceGroup
 }
