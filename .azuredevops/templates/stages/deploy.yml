@@ -24,7 +24,7 @@ stages:
       - template: ../variables/shared.yml@Self
     jobs:
       - deployment: DeployApp
-        displayName: 'Deploy Project - ${{ parameters.project }}'
+        displayName: 'Deploy Project'
         environment: 'todos-on-azure'
         strategy:
           runOnce:
@@ -58,7 +58,7 @@ stages:
                     azureSubscription: $(serviceConnection)
                     scriptLocation: 'inlineScript'
                     inlineScript: >-
-                      az deployment sub create -f src/${{ parameters.project }}/main.bicep 
+                      az deployment sub create -f src/${{ parameters.project }}/infra/main.bicep 
                       --location $(deploymentMetadataLocation) 
                       --parameters 
                       location=$(resourceLocation) 

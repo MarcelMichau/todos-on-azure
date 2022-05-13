@@ -15,12 +15,12 @@ stages:
   - stage: ${{parameters.stage}}
     dependsOn: ${{parameters.dependsOn}}
     condition: ${{parameters.condition}}
-    displayName: Build
+    displayName: Build Project - ${{ parameters.project }}
     pool:
       vmImage: 'ubuntu-latest'
     jobs:
       - job: Build
-        displayName: 'Build Project - ${{ parameters.project }}'
+        displayName: 'Build Project'
 
         variables:
           buildConfiguration: 'release'
