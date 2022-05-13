@@ -53,6 +53,7 @@ module functionApp 'br:acrmarcelmichau.azurecr.io/bicep/modules/function-app:v0.
   scope: appResourceGroup
 }
 
+// Required to allow function app permission to insert/read todos from Table Storage
 module roleAssignments 'roleAssignments.bicep' = {
   name: 'storage-table-contributor-role-assignment'
   params: {

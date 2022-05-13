@@ -69,6 +69,6 @@ stages:
                   displayName: 'Deploy Azure Function'
                   inputs:
                     azureSubscription: $(serviceConnection)
-                    appType: functionAppLinux
+                    appType: functionApp
                     appName: func-$(appName)
                     package: '$(Pipeline.Workspace)/**/*.zip'

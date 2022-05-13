@@ -52,12 +52,3 @@ module functionApp 'br:acrmarcelmichau.azurecr.io/bicep/modules/function-app:v0.
   }
   scope: appResourceGroup
 }
-
-module roleAssignments 'roleAssignments.bicep' = {
-  name: 'storage-table-contributor-role-assignment'
-  params: {
-    storageAccountName: storageAccount.outputs.name
-    functionAppName: functionApp.outputs.name
-  }
-  scope: appResourceGroup
-}
