@@ -5,11 +5,13 @@ trigger:
       - main
 
 parameters:
-  - name: deploy
-    displayName: Infrastructure to Deploy
-    type: object
-    default:
-      - path: api
+  - name: project
+    displayName: Project to Deploy
+    type: string
+    values:
+      - FunctionAppWithCosmosDb
+      - FunctionAppWithSql
+      - FunctionAppWithTableStorage
 
 variables:
   serviceConnection: PersonalSubscriptionServiceConnection
@@ -21,9 +23,8 @@ stages:
 
   - template: templates/stages/deploy.yml@Self
     parameters:
-      stage: Deploy_dev
+      stage: Deploy
       dependsOn:
         - Build
-      environment: dev
       serviceConnection: ${{ variables.serviceConnection }}
-      infra: ${{ parameters.deploy }}
+      project: ${{ parameters.project }}
