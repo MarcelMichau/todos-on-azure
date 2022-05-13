@@ -20,6 +20,7 @@ stages:
   - template: templates/stages/build.yml@Self
     parameters:
       stage: Build
+      project: ${{ parameters.project }}
 
   - template: templates/stages/deploy.yml@Self
     parameters:
