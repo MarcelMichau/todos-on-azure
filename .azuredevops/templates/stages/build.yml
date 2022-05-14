@@ -8,49 +8,50 @@ parameters:
   - name: condition
     type: string
     default: and(succeeded(), true)
+  - name: project
+    type: string
 
 stages:
   - stage: ${{parameters.stage}}
     dependsOn: ${{parameters.dependsOn}}
     condition: ${{parameters.condition}}
-    displayName: Build
+    displayName: Build Project - ${{ parameters.project }}
     pool:
       vmImage: 'ubuntu-latest'
     jobs:
       - job: Build
-        displayName: 'Build API Function'
+        displayName: 'Build Project'
 
         variables:
           buildConfiguration: 'release'
-          artifactName: api
 
         steps:
           - task: NuGetAuthenticate@0
 
           - task: DotNetCoreCLI@2
-            displayName: 'Restore project dependencies'
+            displayName: 'Restore Project Dependencies - ${{ parameters.project }}'
             inputs:
               command: 'restore'
-              projects: '**/*.csproj'
+              projects: 'src/${{ parameters.project }}/**/*.csproj'
               nugetConfigPath: 'NuGet.config'
               feedsToUse: config
 
           - task: DotNetCoreCLI@2
-            displayName: 'Build the project'
+            displayName: 'Build Project - ${{ parameters.project }}'
             inputs:
               command: 'build'
               arguments: '--no-restore --configuration $(buildConfiguration)'
-              projects: '**/*.csproj'
+              projects: 'src/${{ parameters.project }}/**/*.csproj'
 
           - task: DotNetCoreCLI@2
-            displayName: 'Publish the project'
+            displayName: 'Publish Project - ${{ parameters.project }}'
             inputs:
               command: 'publish'
-              projects: '**/*.csproj'
+              projects: 'src/${{ parameters.project }}/**/*.csproj'
               publishWebProjects: false
-              arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(artifactName)'
+              arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/${{ parameters.project }}'
               zipAfterPublish: true
 
-          - publish: '$(Build.ArtifactStagingDirectory)/$(artifactName)'
-            displayName: 'Publish Artifact - $(artifactName)'
-            artifact: $(artifactName)
+          - publish: '$(Build.ArtifactStagingDirectory)/${{ parameters.project }}'
+            displayName: 'Publish Artifact - ${{ parameters.project }}'
+            artifact: ${{ parameters.project }}

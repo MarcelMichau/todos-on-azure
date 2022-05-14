@@ -1,6 +1,0 @@
-variables:
-  appName: todos-on-azure
-  appShortName: todosazure
-  containerRegistry: acrmarcelmichau
-  deploymentMetadataLocation: northeurope
-  resourceLocation: southafricanorth
