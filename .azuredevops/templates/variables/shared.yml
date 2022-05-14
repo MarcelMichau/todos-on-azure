@@ -3,4 +3,4 @@ variables:
   appShortName: todosazure
   containerRegistry: acrmarcelmichau
   deploymentMetadataLocation: northeurope
-  resourceLocation: southafricanorth
+  resourceLocation: northeurope
