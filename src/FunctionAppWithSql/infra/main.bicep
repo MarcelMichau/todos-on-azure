@@ -52,3 +52,23 @@ module functionApp 'br:acrmarcelmichau.azurecr.io/bicep/modules/function-app:v0.
   }
   scope: appResourceGroup
 }
+
+module sqlServer 'br:acrmarcelmichau.azurecr.io/bicep/modules/sql-server:v0.1' = {
+  name: 'sql-${appName}'
+  params: {
+    location: location
+    azureAdAdministratorLogin: 'azure-sql-administrators'
+    azureAdAdministratorObjectId: '6fe16a87-222a-4a1a-b820-9b7fd37b44a8'
+  }
+  scope: appResourceGroup
+}
+
+module sqlDatabase 'br:acrmarcelmichau.azurecr.io/bicep/modules/sql-database:v0.1' = {
+  name: 'sqldb-${appName}'
+  params: {
+    location: location
+    databaseName: 'sqldb-${appName}'
+    sqlServerName: sqlServer.outputs.name
+  }
+  scope: appResourceGroup
+}
